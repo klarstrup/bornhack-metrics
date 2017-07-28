@@ -1,7 +1,7 @@
 {
-  "name": "irlbar-stats-api",
+  "name": "bornhack-metrics",
   "version": "0.0.1",
-  "main": "index.js",
+  "main": "api.start.js",
   "license": "MIT",
   "scripts": {
     "start": "set NODE_ENV=production && node src/api.start.prod.js",
