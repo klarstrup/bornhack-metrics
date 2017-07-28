@@ -49,7 +49,7 @@ if (cluster.isMaster) {
     chalk: chalk.bgMagenta.black
   });
 
-  cluster.on("exit", (worker, code, signal) => {
+  cluster.on("exit", worker => {
     console.log(`worker ${worker.process.pid} died`);
     if (worker.suicide === true) {
       console.log(`${new Date()} Worker committed suicide`);
