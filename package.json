@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "set NODE_ENV=production && node src/api.start.prod.js",
-    "dev": "nodemon src/api.start.js"
+    "dev": "set NODE_ENV=development && nodemon src/api.start.js"
   },
   "dependencies": {
     "apollo-server-express": "^1.0.2",
