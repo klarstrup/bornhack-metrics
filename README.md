@@ -44,3 +44,26 @@ These documents must contain a unique `id` property, which will be used to upser
 Other than that there are no specifics as to the structure of the document, and you may nest objects and arrays however you feel like.
 
 However, please try to stick to one structure within each collection.
+
+# For running
+
+Make sure to have Node 8.2+ and yarn 0.24+ installed and the relevant mongodb server running.
+
+## To install
+```shell
+$ yarn
+```
+
+## To run
+Copy and populate `.env.example` as `.env` and run
+```shell
+$ yarn start
+```
+This'll start a cluster of as many workers as there are cores.
+
+## To dev
+Copy and populate `.env.example` as `.env` and run
+```shell
+$ yarn dev
+```
+This'll start a single process with nodemon for auto-reloading.
