@@ -40,7 +40,6 @@ function logServerStarted(opt = {}) {
   );
 }
 
-const PORT = 8079;
 const app = express();
 app.use("/graphql", cors(), bodyParser.json(), graphqlExpress({ schema }));
 app.use(
@@ -123,10 +122,16 @@ app.post("/submit", async (request, response) => {
   }
 });
 
-const server = app.listen(PORT, () =>
-  logServerStarted({
-    type: "GraphQL API",
-    host: "localhost",
+const {
+  HOST='localhost', 
+  PORT=8079,
+  NODE_ENV,
+} = process.env;
+
+const server = app.listen(PORT, HOST, () =>
+  NODE_ENV==='development' && logServerStarted({
+    type: "Bornhack Metrics",
+    host: HOST,
     port: PORT,
     chalk: chalk.bgMagenta.black
   })

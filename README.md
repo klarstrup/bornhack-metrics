@@ -6,6 +6,9 @@ _(eventually)_ Explore the data over at `https://metrics.bornhack.dk/graphiql`
 
 _(eventually)_ POST graphql queries to `https://metrics.bornhack.dk/graphql`
 
+_(eventually)_ Check out visualizations at  `https://metrics.bornhack.dk/`
+
+
 # For Bornhack teams
 _(eventually)_ You'll get a secret from the metrics team, you've to POST your data for metrics as follows:
 
