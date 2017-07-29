@@ -47,9 +47,9 @@ However, please try to stick to one structure within each collection.
 
 # For running
 
-Make sure to have Node 8.2+ and yarn 0.24+ installed and the relevant mongodb server running.
+Make sure to have Node 8.2+ and yarn 0.24+ installed and the relevant mongodb server as indicated in .env is running.
 
-## To install
+## To install dependencies
 ```shell
 $ yarn
 ```
