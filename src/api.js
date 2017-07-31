@@ -123,7 +123,7 @@ app.post("/submit", async (request, response) => {
 });
 
 const {
-  HOST='localhost', 
+  HOST='localhost',
   PORT=8079,
   NODE_ENV,
 } = process.env;
