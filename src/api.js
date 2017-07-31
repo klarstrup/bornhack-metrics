@@ -5,8 +5,6 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import { graphqlExpress, graphiqlExpress } from "apollo-server-express";
 import chalk from "chalk";
-import ip from "ip";
-import boxen from "boxen";
 import _ from "lodash";
 import { escape as mongoEscape } from "mongo-escape";
 
@@ -14,39 +12,13 @@ import schema from "./schema";
 
 import db from "./db";
 
-function logServerStarted(opt = {}) {
-  let message = chalk.green(
-    `Running ${(opt.chalk || chalk.bold)(opt.type)} in ${chalk.bold(
-      process.env.NODE_ENV || "development"
-    )} mode\n\n`
-  );
-
-  const localURL = `http://${opt.host}:${opt.port}`;
-  message += `- ${chalk.bold("Local:           ")} ${localURL}`;
-
-  try {
-    const url = `http://${ip.address()}:${opt.port}`;
-    message += `\n- ${chalk.bold("On Your Network: ")} ${url}`;
-  } catch (err) {
-    /* ignore errors */
-  }
-
-  console.log(
-    boxen(message, {
-      padding: 1,
-      borderColor: "green",
-      margin: 1
-    })
-  );
-}
-
 const app = express();
 app.use("/graphql", cors(), bodyParser.json(), graphqlExpress({ schema }));
 app.use(
   "/graphiql",
   graphiqlExpress({
-    endpointURL: "/graphql"
-  })
+    endpointURL: "/graphql",
+  }),
 );
 app.use("/submit", cors(), bodyParser.json({ limit: "50mb" }));
 app.post("/submit", async (request, response) => {
@@ -65,19 +37,19 @@ app.post("/submit", async (request, response) => {
     if (!collection) {
       throw {
         message: "Request body must include `collection` field.",
-        status: 400
+        status: 400,
       };
     }
     if (!_.isString(collection)) {
       throw {
         message: "Request body field `collection` must be a string.",
-        status: 400
+        status: 400,
       };
     }
     if (!documents) {
       throw {
         message: "Request body must include `documents` field.",
-        status: 400
+        status: 400,
       };
     }
     if (
@@ -89,7 +61,7 @@ app.post("/submit", async (request, response) => {
       throw {
         message: `Request body field \`documents\` must be an array of objects with an \`id\` field.
           The \`id\` field is unique and any existing document with the same \`id\` in the given collection will be overwritten.`,
-        status: 400
+        status: 400,
       };
     }
 
@@ -102,9 +74,9 @@ app.post("/submit", async (request, response) => {
         return db
           .collection(`${teamDocument.slug}_${collection}`)
           .update({ id: newDocument.id }, newDocument, {
-            upsert: true
+            upsert: true,
           });
-      })
+      }),
     );
 
     response.status(200).json({
@@ -112,7 +84,7 @@ app.post("/submit", async (request, response) => {
       upsertResults: upsertResults.map(upsertResult => {
         delete upsertResult.upserted;
         return upsertResult;
-      })
+      }),
     });
   } catch (error) {
     if (error.status === 401) {
@@ -122,20 +94,11 @@ app.post("/submit", async (request, response) => {
   }
 });
 
-const {
-  HOST='localhost',
-  PORT=8079,
-  NODE_ENV,
-} = process.env;
+const { HOST = "localhost", PORT = 8079, NODE_ENV } = process.env;
 
-const server = app.listen(PORT, HOST, () =>
-  NODE_ENV==='development' && logServerStarted({
-    type: "Bornhack Metrics",
-    host: HOST,
-    port: PORT,
-    chalk: chalk.bgMagenta.black
-  })
-);
+const server = app.listen(PORT, HOST, () => {
+  console.log(`Bornhack Metrics server PID: ${process.pid} running`);
+});
 
 // Gracefulness
 server.on("connection", socket => {
