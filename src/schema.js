@@ -45,7 +45,7 @@ const typeDefs = `
     purchases: [Purchase]
   }
   type Query {
-    getPurchases: [Purchase]
+    getPurchases(before: Float, limit: Int): [Purchase]
     getCamps: [Camp]
   }
 `;
@@ -132,6 +132,8 @@ const productReducer = (productName = "", variantName = "") => {
       break;
     case "Club Mate":
       metadata.volume = 500;
+      metadata.sugar = 5;
+      metadata.caffeine = 0.02;
       break;
     case "Cocio":
       switch (variantName) {
@@ -144,13 +146,18 @@ const productReducer = (productName = "", variantName = "") => {
       switch (variantName) {
         case "0,5L Faxe Kondi":
         case "Faxe Kondi":
+          metadata.volume = 500;
+          metadata.sugar = 10;
+          break;
         case "0.5L Coca Cola":
         case "Coca Cola":
           metadata.volume = 500;
+          metadata.sugar = 10.6;
           break;
       }
       if (variantName.substr(-6) === " - Thy") {
         metadata.volume = 250;
+        metadata.sugar = 9;
       }
       break;
     case "Vodka":
@@ -235,28 +242,33 @@ const resolvers = {
     },
   }),
   Query: {
-    getPurchases: () => db.bar_purchases.find(),//.skip(Math.random()*1000),
+    getPurchases: (obj, { before=Number.MAX_SAFE_INTEGER, limit=0, skip=0 }) => db.bar_purchases.find({
+        timestamp: { $lte: before },
+      }).sort({ timestamp: -1 }).skip(skip).limit(limit), // .skip(Math.random()*1000),
     getCamps: () => camps,
   },
   Purchase: {
     id: ({ purchaseUUID1 }) => purchaseUUID1,
     purchasedAt: ({ timestamp }) => new Date(timestamp),
     totalAlcohol: ({ products }, { unit }) => {
-      const totalAlcoholInML = products.reduce((total, { name, variantName, quantity }) => {
-        const { abv=0, volume=0 } = productReducer(name, variantName);
+      const totalAlcoholInML = products.reduce(
+        (total, { name, variantName, quantity }) => {
+          const { abv = 0, volume = 0 } = productReducer(name, variantName);
 
-        const alcohol = quantity * abv * volume;
-        return total + alcohol;
-      }, 0);
+          const alcohol = quantity * abv * volume;
+          return total + alcohol;
+        },
+        0,
+      );
 
       switch (unit) {
-        case 'MILLILITER':
-          return totalAlcoholInML;
-        break;
-        case 'GENSTAND':
-          return totalAlcoholInML/15;
-        break;
+        case "GENSTAND":
+          return totalAlcoholInML / 15;
+        default:
+          break;
       }
+
+      return totalAlcoholInML;
     },
     purchasedDuring: ({ timestamp }) =>
       camps.find(({ startDate, endDate }) =>
@@ -270,11 +282,15 @@ const resolvers = {
           $gte: +startDate,
           $lt: +endDate,
         },
-      })//.skip(Math.random()*1000),
+      }), // .skip(Math.random()*1000),
   },
   Product: {
-    id: product=>JSON.stringify(product),
-    metadata: ({ name, variantName }) => _.toPairs(productReducer(name, variantName)).map(([name, value]) => ({ name, value })),
+    id: product => JSON.stringify(product),
+    metadata: ({ name, variantName }) =>
+      _.toPairs(productReducer(name, variantName)).map(([name, value]) => ({
+        name,
+        value,
+      })),
   },
 };
 

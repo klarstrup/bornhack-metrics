@@ -36,6 +36,7 @@
     "mongo-escape": "^2.0.6",
     "mongodb": "^2.2.30",
     "nodemon": "^1.11.0",
+    "optics-agent": "^1.1.6",
     "pm2": "^2.6.1",
     "querystring": "^0.2.0",
     "recluster": "^0.4.5",

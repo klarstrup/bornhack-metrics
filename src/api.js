@@ -4,7 +4,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import { graphqlExpress, graphiqlExpress } from "apollo-server-express";
-import chalk from "chalk";
+import OpticsAgent from "optics-agent";
 import _ from "lodash";
 import { escape as mongoEscape } from "mongo-escape";
 
@@ -12,8 +12,19 @@ import schema from "./schema";
 
 import db from "./db";
 
+OpticsAgent.instrumentSchema(schema);
+
 const app = express();
-app.use("/graphql", cors(), bodyParser.json(), graphqlExpress({ schema }));
+app.use(
+  "/graphql",
+  cors(),
+  bodyParser.json(),
+  OpticsAgent.middleware(),
+  graphqlExpress(request => ({
+    schema,
+    context: { opticsContext: OpticsAgent.context(request) },
+  })),
+);
 app.use(
   "/graphiql",
   graphiqlExpress({
